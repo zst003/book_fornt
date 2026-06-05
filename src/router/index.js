@@ -4,20 +4,55 @@ import HomeView from '../views/HomeView.vue'
 
 Vue.use(VueRouter)
 
-const routes = [
+const routes = [    // 路由配置
   {
-    path: '/',
-    name: 'home',
-    component: HomeView
+    path: '/login',
+    name: 'login',
+    component: () => import(/* webpackChunkName: "about" */ '../views/LoginView.vue')
   },
   {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
-  }
+    path: '/register',
+    name: 'Register',
+    component: () => import(/* webpackChunkName: "about" */ '../views/RegisterView.vue')
+  },
+  
+  {
+    path: '/',
+    name: 'Layout',
+    component: () => import(/* webpackChunkName: "about" */ '../views/Layout.vue'),
+
+    children:[
+      {
+        path: '',
+        name: 'home',
+        component: HomeView
+        
+      },
+      
+      {
+        path: 'admin',
+        name: 'AdminView',
+        component: () => import(/* webpackChunkName: "about" */ '../views/AdminView.vue')
+      },
+      {
+        path: 'reader',
+        name: 'ReaderView',
+        component: () => import(/* webpackChunkName: "about" */ '../views/ReaderView.vue')
+      },
+      {
+        path: 'book',
+        name: 'BookView',
+        component: () => import(/* webpackChunkName: "about" */ '../views/BookView.vue')
+      },
+      {
+        path: 'borrow',
+        name: 'BorrowView',
+        component: () => import(/* webpackChunkName: "about" */ '../views/BorrowView.vue')
+      }
+
+    ]
+  },
+  
 ]
 
 const router = new VueRouter({
