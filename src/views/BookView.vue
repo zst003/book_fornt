@@ -15,13 +15,15 @@
             <el-table
         :data="tableData"
         style="width: 100%">
-        <el-table-column prop="book_name" label="图书名称"></el-table-column>
-        <el-table-column prop="book_author" label="图书作者"></el-table-column>
-        <el-table-column prop="book_price" label="图书价格"></el-table-column>
-        <el-table-column prop="book_press" label="图书出版社"></el-table-column>
-        <el-table-column prop="book_img" label="图书封面">
+        <el-table-column prop="bookId" label="图书ID"></el-table-column>
+        <el-table-column prop="bookName" label="图书名称"></el-table-column>
+        <el-table-column prop="bookAuthor" label="图书作者"></el-table-column>
+        <el-table-column prop="bookPrice" label="图书价格"></el-table-column>
+        <el-table-column prop="bookPress" label="图书出版社"></el-table-column>
+g        <el-table-column prop="bookImg" label="图书封面">
             <template slot-scope="scope" >
-                <img :src="scope.row.book_img" style="width: 50px; height: 50px;">
+                <img v-if="scope.row.bookImg" :src="scope.row.bookImg" style="width: 50px; height: 50px;">
+                <span v-else>无封面</span>
             </template>
         </el-table-column>
 
@@ -30,7 +32,7 @@
           <template slot-scope="scope">
             <el-button type="success" @click="edit(scope.row)" icon="el-icon-edit">编辑</el-button>
             <!-- @confirm ="del(scope.row)" 表示点击删除按钮时，执行del方法，并传入当前行的数据,根据id来进行删除操作 -->
-            <el-popconfirm title="确定删除吗？" @confirm ="del(scope.row.book_id)">  
+            <el-popconfirm title="确定删除吗？" @confirm ="del(scope.row.bookId)">  
                       <el-button slot="reference" type="danger" style="margin-left: 5px;"  icon="el-icon-delete">删除</el-button>
             </el-popconfirm>
             
@@ -60,16 +62,16 @@
           <el-dialog title="请填写信息" :visible.sync="dialogFormVisible" width="30%">
               <el-form :model="form">
                 <el-form-item label="图书名称" label-width="20%">
-                  <el-input v-model="form.book_name" autocomplete="off" style="width: 90%"></el-input>
+                  <el-input v-model="form.bookName" autocomplete="off" style="width: 90%"></el-input>
                 </el-form-item>
                 <el-form-item label="图书作者" label-width="20%">
-                  <el-input v-model="form.book_author" autocomplete="off" style="width: 90%"></el-input>
+                  <el-input v-model="form.bookAuthor" autocomplete="off" style="width: 90%"></el-input>
                 </el-form-item>
                 <el-form-item label="图书价格" label-width="20%">
-                  <el-input v-model="form.book_price" autocomplete="off" style="width: 90%"></el-input>
+                  <el-input v-model="form.bookPrice" autocomplete="off" style="width: 90%"></el-input>
                 </el-form-item>
                 <el-form-item label="图书出版社" label-width="20%">
-                  <el-input v-model="form.book_press" autocomplete="off" style="width: 90%"></el-input>
+                  <el-input v-model="form.bookPress" autocomplete="off" style="width: 90%"></el-input>
                 </el-form-item>
                 <el-form-item label="图书封面" label-width="20%" prop="picture">
                   <!-- :on-preview="handlePreview" -->
@@ -136,7 +138,7 @@ export default {
           if (response.code === '0') {
             this.$message.success('图片上传成功');
             // 假设 response.data.url 是上传后返回的图片 URL
-            this.form.book_img = response.data; // 将图片 URL 保存到表单数据中
+            this.form.bookImg = response.data; // 将图片 URL 保存到表单数据中
           } else {
             this.$message.error(response.msg);
           }
@@ -148,7 +150,7 @@ export default {
           console.log(file, fileList);
           this.fileList = fileList; // 更新文件列表
           if (fileList.length === 0) {
-            this.form.book_img = ''; // 如果没有文件，清空表单中的图片信息
+            this.form.bookImg = ''; // 如果没有文件，清空表单中的图片信息
           }
         },
 
@@ -156,8 +158,19 @@ export default {
                               request.get("/book/bookSearch", {
                                 params: this.params
                               }).then(res => {
+                                // 调试：查看后端返回的完整数据
+                                console.log('后端返回的数据:', res);
+                                if(res.data && res.data.list){
+                                  console.log('图书列表数据:', res.data.list);
+                                  // 查看第一条数据的字段名
+                                  if(res.data.list && res.data.list.length > 0 && res.data.list[0] !== null){
+                                    console.log('第一条数据的字段:', Object.keys(res.data.list[0]));
+                                    console.log('第一条数据内容:', res.data.list[0]);
+                                  }
+                                }
                                 if(res.code === '0'){
-                                  this.tableData = res.data.list;  //将查询到的结果赋值给tableData
+                                  // 过滤掉null和undefined的数据
+                                  this.tableData = (res.data.list || []).filter(item => item !== null && item !== undefined);  //将查询到的结果赋值给tableData
                                     this.total = res.data.total;  //将查询到的结果的总条数赋值给total
                                 }else{
                                   this.$message.error(res.msg);
@@ -174,14 +187,15 @@ export default {
                                 this.dialogFormVisible = true;  //弹窗显示
                               },
                 edit(obj){  //编辑方法
-                                this.form = obj;  //将当前行的数据赋值给form
+                                // 将驼峰命名和原数据都赋值给form，确保能正确显示和提交
+                                this.form = {...obj};  //将当前行的数据赋值给form
                                 this.dialogFormVisible = true;  //弹窗显示
 
                               },
                 reset(){ //清空方法
                                 this.params={
-                                  name: '',
-                                  phone: '',
+                                  book_name: '',
+                                  book_author: '',
                                   pageNum:1,   //表示当前页码
                                   pageSize:5   //表示每页显示的条数
                                 }

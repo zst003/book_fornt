@@ -6,6 +6,10 @@ Vue.use(VueRouter)
 
 const routes = [    // 路由配置
   {
+    path: '/',
+    redirect: '/login'
+  },
+  {
     path: '/login',
     name: 'login',
     component: () => import(/* webpackChunkName: "about" */ '../views/LoginView.vue')
@@ -17,7 +21,7 @@ const routes = [    // 路由配置
   },
   
   {
-    path: '/',
+    path: '/home',
     name: 'Layout',
     component: () => import(/* webpackChunkName: "about" */ '../views/Layout.vue'),
 

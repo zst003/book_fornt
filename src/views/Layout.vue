@@ -20,11 +20,11 @@
 
     <!--  Main+Aside-->
     <el-container>
-      <el-aside style="overflow: hidden;min-height:100vh; width: 250px;background-color:#5c2223;"> 
+      <el-aside style="overflow: hidden;min-height:100vh; width: 250px;background-color:#5c2223;">
         <!-- default-active="$route.path"表示默认选中当前路由 再加上一个router属性，表示使用vue-router  
          vue-router的路由跳转，可以用this.$router.push("/login")，this.$router.replace("/login")，this.$router.go(-1)-->
         <el-menu default-active="$route.path" router class="el-menu-vertical-demo" @open="handleOpen"@close="handleClose" background-color="#5c2223" text-color="#fff" active-text-color="#ffd04b">  <!--active-text-color表示选中菜单项的文字颜色 -->
-      <el-menu-item index="/">
+      <el-menu-item index="/home">
         <i class="el-icon-s-home"></i>
         <span slot="title">首页</span>
       </el-menu-item>
@@ -35,8 +35,8 @@
           <span>图书管理</span>
         </template>
         <el-menu-item-group>
-          <el-menu-item index="/book">图书基本信息</el-menu-item> <!--index="/book"表示点击菜单项后跳转到"/book"页面-->
-          <el-menu-item index="/borrow">借阅信息管理</el-menu-item>
+          <el-menu-item index="/home/book">图书信息管理</el-menu-item> <!--index="/home/book"表示点击菜单项后跳转到"/home/book"页面-->
+          <el-menu-item index="/home/borrow">借阅信息管理</el-menu-item>
         </el-menu-item-group>
       </el-submenu>
       
@@ -46,8 +46,8 @@
           <span>信息管理</span>
         </template>
         <el-menu-item-group>
-          <el-menu-item index="/admin">管理员信息</el-menu-item>
-          <el-menu-item index="/reader">读者信息</el-menu-item>
+          <el-menu-item index="/home/admin">管理员信息管理</el-menu-item>
+          <el-menu-item index="/home/reader">读者信息管理</el-menu-item>
         </el-menu-item-group>
       </el-submenu>
       

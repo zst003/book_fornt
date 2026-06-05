@@ -24,4 +24,6 @@ export default {
 
 </style>
 <!--登录的话
+测试账户：admin3
+密码：admin3
 -->

@@ -1,7 +1,7 @@
 <template>
    <div>
     <div style="margin-bottom: 20px;">
-        <el-input v-model="params.reader_name" style="width: 200px;" placeholder="请输入姓名"></el-input>
+        <el-input v-model="params.readerName" style="width: 200px;" placeholder="请输入姓名"></el-input>
         <el-input v-model="params.reader_phone" style="width: 200px;margin-left: 5px;" placeholder="请输入手机号"></el-input>
         <el-button type="primary" icon="el-icon-search" style="margin-left: 10px;" @click="findBySearch()">查询</el-button>
         <el-button type="danger" icon="el-icon-delete" style="margin-left: 10px;" @click="reset()">清空</el-button>
@@ -9,10 +9,11 @@
     </div>
     <div>
     <el-table :data="tableData" style="width: 100%">
-      <el-table-column prop="reader_name" label="姓名" ></el-table-column>
-          <el-table-column prop="reader_sex" label="性别"></el-table-column>
-          <el-table-column prop="reader_age" label="年龄"></el-table-column>
-          <el-table-column prop="reader_phone" label="手机号"></el-table-column>
+      <el-table-column type="index" label="序号" width="50"></el-table-column>
+      <el-table-column prop="readerName" label="姓名" ></el-table-column>
+          <el-table-column prop="readerSex" label="性别"></el-table-column>
+          <el-table-column prop="readerAge" label="年龄"></el-table-column>
+          <el-table-column prop="readerPhone" label="手机号"></el-table-column>
 
       <el-table-column label="操作" width="180">
         <template slot-scope = "scope">  
@@ -46,17 +47,17 @@
       <el-dialog title="请填写信息" :visible.sync="dialogFormVisible" width="30%">
         <el-form :model="readerForm">
           <el-form-item label="姓名" label-width="15%">
-            <el-input v-model="readerForm.reader_name" autocomplete="off" style="width: 90%;"></el-input>
+            <el-input v-model="readerForm.readerName" autocomplete="off" style="width: 90%;"></el-input>
           </el-form-item>
           <el-form-item label="性别" label-width="15%">
-            <el-radio v-model="readerForm.reader_sex" label="男">男</el-radio>
-            <el-radio v-model="readerForm.reader_sex" label="女">女</el-radio>
+            <el-radio v-model="readerForm.readerSex" label="男">男</el-radio>
+            <el-radio v-model="readerForm.readerSex" label="女">女</el-radio>
           </el-form-item>
           <el-form-item label="年龄" label-width="15%">
-            <el-input v-model="readerForm.reader_age" autocomplete="off" style="width: 90%;"></el-input>
+            <el-input v-model="readerForm.readerAge" autocomplete="off" style="width: 90%;"></el-input>
           </el-form-item>
           <el-form-item label="电话" label-width="15%">
-            <el-input v-model="readerForm.reader_phone" autocomplete="off" style="width: 90%;"></el-input>
+            <el-input v-model="readerForm.readerPhone" autocomplete="off" style="width: 90%;"></el-input>
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
@@ -78,8 +79,8 @@ import request from '@/utils/request';
       data() {
         return {
             params:{
-              reader_name: '',
-              reader_phone: '',
+              readerName: '',
+              readerPhone: '',
               pageNum:1,
               pageSize:5
             },
@@ -111,8 +112,8 @@ import request from '@/utils/request';
 
         reset(){  //清空搜索条件
           this.params = {
-            reader_name: '',
-            reader_phone: '',
+            readerName: '',
+            readerPhone: '',
             pageNum:1,
             pageSize:5
           }
@@ -132,19 +133,28 @@ import request from '@/utils/request';
           this.readerForm = {};  //清空表单数据
           this.dialogFormVisible = true;  //弹出框-显示 
              },
-        submit(){ //提交新增
-          request.post("/reader",this.readerForm).then(res =>{
+        submit(){ //提交新增或编辑
+          // 判断是新增还是编辑
+          const url = this.readerForm.reader_id ? "/reader" : "/reader";
+          const method = this.readerForm.reader_id ? "put" : "post";
+          
+          request({
+            url: url,
+            method: method,
+            data: this.readerForm
+          }).then(res =>{
             if(res.code === '0'){  //请求成功
               this.$message({
-                message: '操作成功',
+                message: this.readerForm.reader_id ? '修改成功' : '新增成功',
                 type: 'success'
               });
-              this.dialogFormVisible = false;  //弹出框-显示
+              this.dialogFormVisible = false;  //关闭弹出框
+              this.findBySearch();  //刷新数据
             }
             else{
               this.$message({
                 message:res.msg,
-                type: 'success'
+                type: 'error'
               });
 
             }
@@ -168,7 +178,7 @@ import request from '@/utils/request';
             else{  //请求失败-显示错误信息
               this.$message({
                 message:res.msg,
-                type: 'success'
+                type: 'error'
               });
              
 
