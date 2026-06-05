@@ -27,7 +27,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column label="操作" width="550">
+        <el-table-column label="操作" width="350">
           <template slot-scope="scope">
             <!-- 归还按钮：只针对未归还的记录显示 -->
             <el-button 
